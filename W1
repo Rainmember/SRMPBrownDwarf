@@ -19,7 +19,7 @@ dfBDKP3A =pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/BDKP3A.txt", sep="\s+", c
 # [ 'Name', 'Lgn', 'sptn', 'pmn', 'Jn', 'Jne', 'Hn', 'Hne', 'Kn', 'Kne', 'w1n', 'w1ne', 'w2n', 'w2ne', 'w3n', 'w3ne', 'w4n', 'w4ne'])
 df4 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March 05.tsv", sep="\t", comment="#", header=0)
 df5 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March 06.tsv", sep="\t", comment="#", header=0)
-
+df6 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March04.tsv", sep="\t", comment="#", header=0)
 
 
 # slicing data/removing columns (NAN)
@@ -35,16 +35,19 @@ df1_rpm = df1[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err",
 df2_rpm = df2[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total PM b', "2MASS Date",
                "WISE Date"]]
 df4_rpm = df4[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
-               "WISE Date"]]
+               "WISE Date", "Designation"]]
 df5_rpm = df5[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
-               "WISE Date"]]
+               "WISE Date", "Designation"]]
+df6_rpm = df6[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Proper Motion b', "2MASS Date",
+               "WISE Date", "Designation"]]
 
 
 
 # rename
 df2_rpm = df2_rpm.rename(columns={'Total PM b': 'Total Proper Motion', 'Total PM b': 'Total Proper Motion'})
+df6_rpm = df6_rpm.rename(columns={'Proper Motion b': 'Total Proper Motion', 'Proper Motion b': 'Total Proper Motion'})
 # combining files
-frames = [df_rpm, df1_rpm, df2_rpm, df4_rpm, df5_rpm]
+frames = [df_rpm, df1_rpm, df2_rpm, df4_rpm, df5_rpm, df6_rpm]
 result = pd.concat(frames)
 # replace the Zero and start numbering the data
 ignore_index = False
@@ -69,10 +72,24 @@ dfBDKP3A['J-K Color'] = dfBDKP3A['Jn']-dfBDKP3A['Kn']
 dfBDKP3A['RPM W1'] = dfBDKP3A["w1n"]+5*np.log10(dfBDKP3A["pmn"])+5
 
 
+# looking at points on W1
+p=result[(result['RPM_W1'] > 20)]
+u=result[(result['J-K color'] > 2)]
+b=result[(result['RPM_W1'] < 7.5)]
+# adding the points together
+frames1 = [ p, u, b]
+g = pd.concat(frames1)
+
+# removing the duplicates
+g = g.drop_duplicates(subset=['RPM_W1'], keep="first")
+
+
+
 #plotting RPM W1 v J-K color
-plt.scatter(result["J-K color"], result["RPM_W1"], c="red", s=5, zorder=6,label='Our Data')
+plt.scatter(result["J-K color"], result["RPM_W1"], c="red", s=10, zorder=6,label='Our Data')
 plt.scatter(dfLSPM["J-K Color"], dfLSPM["RPM W1"], c="green", s=1, label="LSPM-Wise")
 plt.scatter(dfBDKP3A["J-K Color"], dfBDKP3A["RPM W1"], c="blue", s=1, label='BDKP3A')
+plt.scatter(g["J-K color"], g["RPM_W1"], c="Yellow", s=20, zorder=6,label='Outliers')
 plt.title("RPM W1 Graph", fontsize=15)
 plt.xlabel("J-K color", fontsize=13)
 plt.ylabel("RPM_W1", fontsize=13)
@@ -89,23 +106,13 @@ plt.show()
 
 
 # Saving Figure
-plt.savefig("/Users/Tony/Dropbox/SRMP_shared/RPM W1(1) Graph")
+plt.savefig("/Users/Tony/Dropbox/SRMP_shared/RPM W1(TZ) Graph")
 
 
 
 
-# looking at points on W1
-p=result[(result['RPM_W1'] > 20)]
-u=result[(result['J-K color'] > 2)]
-b=result[(result['RPM_W1'] < 7.5)]
-# adding the points together
-frames1 = [ p, u, b]
-g = pd.concat(frames1)
-
-# removing the duplicates
-g = g.drop_duplicates(subset=['RPM_W1'], keep="first")
-
-g.to_csv('/Users/Tony/Dropbox/SRMP_shared/W_1.txt', header=12, index=100, sep='\t', mode='a')
+# Turning outliers into txt
+g.to_csv('/Users/Tony/Dropbox/SRMP_shared/W_1(TZ).txt', header=12, index=100, sep='\t', mode='a')
 
 
 # 39 appears twice

@@ -21,6 +21,10 @@ df4 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March 05.t
 df5 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March 06.tsv", sep="\t", comment="#", header=0)
 df6 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March04.tsv", sep="\t", comment="#", header=0)
 
+#new object
+df7 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Sheet9(Tony).tsv", sep="\t", comment="#", header=0)
+df8 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - From Daniel.tsv", sep="\t", comment="#", header=0)
+
 
 # slicing data/removing columns (NAN)
 df4 = df4.drop(df4.index[5:8])
@@ -40,7 +44,10 @@ df5_rpm = df5[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err",
                "WISE Date", "Designation"]]
 df6_rpm = df6[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Proper Motion b', "2MASS Date",
                "WISE Date", "Designation"]]
-
+df7_rpm = df7[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
+               "WISE Date", "Designation"]]
+df8_rpm = df8[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
+               "WISE Date", "Designation"]]
 
 
 # rename
@@ -65,16 +72,20 @@ dfBDKP3A=dfBDKP3A[(dfBDKP3A['pmn'] > 0)]
 
 # adding columns
 result["RPM_W1"] = result["W1"]+5*np.log10(result["Total Proper Motion"]/1000)+5
-result["J-K color"] = result["J"]-result["K"]
+result["J-K Color"] = result["J"]-result["K"]
 dfLSPM['J-K Color'] = dfLSPM["Jmag"]-dfLSPM["Kmag"]
 dfLSPM['RPM W1'] = dfLSPM["W1"]+5*np.log10(dfLSPM['PM'])+5
 dfBDKP3A['J-K Color'] = dfBDKP3A['Jn']-dfBDKP3A['Kn']
 dfBDKP3A['RPM W1'] = dfBDKP3A["w1n"]+5*np.log10(dfBDKP3A["pmn"])+5
+df7_rpm["RPM_W1"] = df7_rpm["W1"]+5*np.log10(df7_rpm["Total Proper Motion"]/1000)+5
+df7_rpm["J-K Color"] = df7_rpm["J"]-df7_rpm["K"]
+df8_rpm["RPM_W1"] = df8_rpm["W1"]+5*np.log10(df8_rpm["Total Proper Motion"]/1000)+5
+df8_rpm["J-K Color"] = df8_rpm["J"]-df8_rpm["K"]
 
 
 # looking at points on W1
 p=result[(result['RPM_W1'] > 20)]
-u=result[(result['J-K color'] > 2)]
+u=result[(result['J-K Color'] > 2)]
 b=result[(result['RPM_W1'] < 7.5)]
 # adding the points together
 frames1 = [ p, u, b]
@@ -86,12 +97,15 @@ g = g.drop_duplicates(subset=['RPM_W1'], keep="first")
 
 
 #plotting RPM W1 v J-K color
-plt.scatter(result["J-K color"], result["RPM_W1"], c="red", s=10, zorder=6,label='Our Data')
+fig=plt.figure()
+plt.scatter(df8_rpm["J-K Color"], df8_rpm["RPM_W1"], c="red", s=10, zorder=6)
+plt.scatter(df7_rpm["J-K Color"], df7_rpm["RPM_W1"], c="Black", s=100, zorder=6)
+plt.scatter(result["J-K Color"], result["RPM_W1"], c="red", s=10, zorder=6,label='Our Data')
 plt.scatter(dfLSPM["J-K Color"], dfLSPM["RPM W1"], c="green", s=1, label="LSPM-Wise")
 plt.scatter(dfBDKP3A["J-K Color"], dfBDKP3A["RPM W1"], c="blue", s=1, label='BDKP3A')
-plt.scatter(g["J-K color"], g["RPM_W1"], c="Yellow", s=20, zorder=6,label='Outliers')
+plt.scatter(g["J-K Color"], g["RPM_W1"], c="Yellow", s=20, zorder=6,label='Outliers')
 plt.title("RPM W1 Graph", fontsize=15)
-plt.xlabel("J-K color", fontsize=13)
+plt.xlabel("J-K Color", fontsize=13)
 plt.ylabel("RPM_W1", fontsize=13)
 plt.gca().invert_yaxis()
 ax = plt.subplot(111)
@@ -106,16 +120,12 @@ plt.show()
 
 
 # Saving Figure
-plt.savefig("/Users/Tony/Dropbox/SRMP_shared/RPM W1(TZ) Graph")
+plt.savefig("/Users/Tony/Dropbox/SRMP_shared/RPM W1 (TZ) Graph")
 
+#ValueError: Format "5prism_2011jul21_l7f" is not supported.
 
 
 
 # Turning outliers into txt
 g.to_csv('/Users/Tony/Dropbox/SRMP_shared/W_1(TZ).txt', header=12, index=100, sep='\t', mode='a')
 
-
-# 39 appears twice
-
-
-# Next time I will finish the text file by putting in date obser

@@ -111,31 +111,36 @@ Plot = pd.concat(Plot)
 
 # Plotting J mag graph
 fig=plt.figure()
+fig.set_size_inches(10, 6.45)
 ax1 = fig.add_subplot(111)
 plt.scatter(OutlierOurData["J-K color"], OutlierOurData["RPM J"], c="#FF3030", s=25, zorder=100,label='Outliers')
-plt.scatter(df7_rpm["J-K color"][0], df7_rpm["RPM J"][0], c="indigo", s=200, zorder=800, marker='*', label='J044+0228')
-plt.scatter(df7_rpm["J-K color"][1], df7_rpm["RPM J"][1], c="#005200", s=200, zorder=800, marker='*', label='J2012+6726')
-plt.scatter(df7_rpm["J-K color"][2], df7_rpm["RPM J"][2], c="yellow", s=200, zorder=800, marker='*', label='J2116+1555')
+plt.scatter(df7_rpm["J-K color"][0], df7_rpm["RPM J"][0], c="indigo", s=300, zorder=800, marker='*', label='J0044+0228')
+plt.scatter(df7_rpm["J-K color"][1], df7_rpm["RPM J"][1], c="#005200", s=300, zorder=800, marker='*', label='J2012+6726')
+plt.scatter(df7_rpm["J-K color"][2], df7_rpm["RPM J"][2], c="#FF5102", s=300, zorder=800, marker='*', label='J2116+1555')
+plt.scatter(df7_rpm["J-K color"][2], df7_rpm["RPM J"][2], c="black", s=750, zorder=700, marker='*')
+plt.scatter(df7_rpm["J-K color"][0], df7_rpm["RPM J"][0], c="black", s=750, zorder=700, marker='*')
+plt.scatter(df7_rpm["J-K color"][1], df7_rpm["RPM J"][1], c="black", s=750, zorder=700, marker='*')
 plt.scatter(Plot["J-K color"], Plot["RPM J"], c="#1874CD", s=20, zorder=6,label='Our Data')
-plt.scatter(nm["J-K Color"], nm["RPM J"], c="#AEB3BF", alpha=0.25,s=1.5, label="Standard")
+plt.scatter(nm["J-K Color"], nm["RPM J"], c="#AEB3BF", alpha=0.25,s=1.5, label="Comparison Objects")
 #plt.scatter(Gamma["J-K color"], Gamma["RPM J"], c="purple", alpha=1,s=25, label="Gamma")
-#plt.scatter(Beta["J-K color"], Beta["RPM J"], c="orange", alpha=1,s=25, label="Beta")
+#plt.scater(Beta["J-K color"], Beta["RPM J"], c="orange", alpha=1,s=25, label="Beta")
 #plt.scatter(Feild["J-K color"], Feild["RPM J"], c="yellow", alpha=1,s=25, label="Field")
 #plt.scatter(SubDwarf["J-K color"], SubDwarf["RPM J"], c="green", alpha=1,s=25, label="Subdwarf")
-plt.xlabel("$J-K$", fontsize=13)
-plt.ylabel("H$_J$", fontsize=13)
+plt.xlabel("$J-K$", fontsize=25)
+plt.ylabel("H$_J$", fontsize=25)
 for axis in ['top', 'bottom', 'left', 'right']:  # Thicken the frame
     ax1.spines[axis].set_linewidth(2)
 plt.gca().invert_yaxis()
 ax = plt.subplot(111)
+ax.tick_params(axis="both", which="major", labelsize=20, width=1.1, length=8)
 # Creating Legend inside
-ax.legend(frameon=False)
+ax.legend(frameon=False, fontsize=15)
 plt.show()
 
 
 # Saving Figure
 plt.tight_layout()
-plt.savefig("/Users/Tony/Dropbox/SRMP_shared/Poster_RPM_J_Graph3")
+plt.savefig("/Users/Tony/Dropbox/SRMP_shared/Poster_RPM_J_GraphFinal2(biggerpoints)")
 
 
 

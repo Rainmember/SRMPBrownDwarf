@@ -86,27 +86,28 @@ w = ourdata[(ourdata['J-K color'] > 2)]
 
 
 # adding the points together
-OutlierOurData = [ q, w]
+OutlierOurData = [q, w]
 OutlierOurData = pd.concat(OutlierOurData)
 
 
 # removing the duplicates
 OutlierOurData = OutlierOurData.drop_duplicates(subset=['RPM J'], keep="first")
 
-
+OutlierOurData = OutlierOurData.drop(26)
+OutlierOurData = OutlierOurData.drop(64)
 #removing duplicate 1800
 df8_rpm = df8_rpm.drop(43)
 #adding Spt type to Daniel's data
-df8_rpm['Spt'] =['g','f','f','g','f','b','b','g','sd','b','f','f','f','f','f','g','f','b','g','g','sd','b','b','b','b','f','f'
-    ,'f','b','b','b','f','g','sd','sd','f','f','b','f','f','f','f','f','f','f']
+#df8_rpm['Spt'] =['g','f','f','g','f','b','b','g','sd','b','f','f','f','f','f','g','f','b','g','g','sd','b','b','b','b','f','f'
+  #  ,'f','b','b','b','f','g','sd','sd','f','f','b','f','f','f','f','f','f','f']
 
-Gamma = df8_rpm[df8_rpm['Spt']=='g']
-Beta = df8_rpm[df8_rpm['Spt']=='b']
-Feild = df8_rpm[df8_rpm['Spt']=='f']
-SubDwarf = df8_rpm[df8_rpm['Spt']=='sd']
+#Gamma = df8_rpm[df8_rpm['Spt']=='g']
+#Beta = df8_rpm[df8_rpm['Spt']=='b']
+#Feild = df8_rpm[df8_rpm['Spt']=='f']
+#SubDwarf = df8_rpm[df8_rpm['Spt']=='sd']
 
-Plot = [ourdata, df8_rpm]
-Plot = pd.concat(Plot)
+#Plot = [ourdata, df8_rpm]
+#Plot = pd.concat(Plot)
 
 
 # Plotting J mag graph

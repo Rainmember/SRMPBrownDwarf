@@ -22,7 +22,7 @@ df5 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March 06.t
 df6 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - March04.tsv", sep="\t", comment="#", header=0)
 
 #new object
-df7 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Sheet9(Tony).tsv", sep="\t", comment="#", header=0)
+df7 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Weirdo.tsv", sep="\t", comment="#", header=0)
 df8 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - From Daniel.tsv", sep="\t", comment="#", header=0)
 
 
@@ -55,11 +55,9 @@ df2_rpm = df2_rpm.rename(columns={'Total PM b': 'Total Proper Motion', 'Total PM
 df6_rpm = df6_rpm.rename(columns={'Proper Motion b': 'Total Proper Motion', 'Proper Motion b': 'Total Proper Motion'})
 # combining files
 frames = [df_rpm, df1_rpm, df2_rpm, df4_rpm, df5_rpm, df6_rpm]
-result = pd.concat(frames)
 # replace the Zero and start numbering the data
-ignore_index = False
-result = pd.concat(frames, ignore_index= True)
 
+ourdata = pd.concat(frames, ignore_index= True)
 
 # Fixing Data
 o=dfLSPM[(dfLSPM['PM'] < 0)]
@@ -71,8 +69,8 @@ dfBDKP3A=dfBDKP3A[(dfBDKP3A['pmn'] > 0)]
 
 
 # adding columns
-result["RPM_W1"] = result["W1"]+5*np.log10(result["Total Proper Motion"]/1000)+5
-result["J-K Color"] = result["J"]-result["K"]
+ourdata["RPM_W1"] = ourdata["W1"]+5*np.log10(ourdata["Total Proper Motion"]/1000)+5
+ourdata["J-K Color"] = ourdata["J"]-ourdata["K"]
 dfLSPM['J-K Color'] = dfLSPM["Jmag"]-dfLSPM["Kmag"]
 dfLSPM['RPM W1'] = dfLSPM["W1"]+5*np.log10(dfLSPM['PM'])+5
 dfBDKP3A['J-K Color'] = dfBDKP3A['Jn']-dfBDKP3A['Kn']
@@ -82,11 +80,14 @@ df7_rpm["J-K Color"] = df7_rpm["J"]-df7_rpm["K"]
 df8_rpm["RPM_W1"] = df8_rpm["W1"]+5*np.log10(df8_rpm["Total Proper Motion"]/1000)+5
 df8_rpm["J-K Color"] = df8_rpm["J"]-df8_rpm["K"]
 
+frames90 = [dfLSPM, dfBDKP3A]
+gg = pd.concat(frames90)
+
 
 # looking at points on W1
-p=result[(result['RPM_W1'] > 20)]
-u=result[(result['J-K Color'] > 2)]
-b=result[(result['RPM_W1'] < 7.5)]
+p=ourdata[(ourdata['RPM_W1'] > 20)]
+u=ourdata[(ourdata['J-K Color'] > 2)]
+b=ourdata[(ourdata['RPM_W1'] < 7.5)]
 # adding the points together
 frames1 = [ p, u, b]
 g = pd.concat(frames1)
@@ -94,29 +95,43 @@ g = pd.concat(frames1)
 # removing the duplicates
 g = g.drop_duplicates(subset=['RPM_W1'], keep="first")
 
-
+df9_rpm =[df8_rpm, ourdata]
 
 #plotting RPM W1 v J-K color
 fig=plt.figure()
-plt.scatter(df8_rpm["J-K Color"], df8_rpm["RPM_W1"], c="red", s=10, zorder=6)
-plt.scatter(df7_rpm["J-K Color"], df7_rpm["RPM_W1"], c="Black", s=100, zorder=6)
-plt.scatter(result["J-K Color"], result["RPM_W1"], c="red", s=10, zorder=6,label='Our Data')
-plt.scatter(dfLSPM["J-K Color"], dfLSPM["RPM W1"], c="green", s=1, label="LSPM-Wise")
-plt.scatter(dfBDKP3A["J-K Color"], dfBDKP3A["RPM W1"], c="blue", s=1, label='BDKP3A')
-plt.scatter(g["J-K Color"], g["RPM_W1"], c="Yellow", s=20, zorder=6,label='Outliers')
+fig.set_size_inches(10, 6.45)
+ax = fig.add_subplot(111)
+plt.scatter(df8_rpm["J-K Color"], df8_rpm["RPM_W1"], c="#1874CD", s=20, zorder=6)
+# our objects
+plt.scatter(df7_rpm["J-K Color"][0], df7_rpm["RPM_W1"][0], c="indigo", s=300, zorder=800, marker='*', label='J0044+0228')
+plt.scatter(df7_rpm["J-K Color"][1], df7_rpm["RPM_W1"][1], c="#005200", s=300, zorder=800, marker='*', label='J2012+6726')
+plt.scatter(df7_rpm["J-K Color"][2], df7_rpm["RPM_W1"][2], c="#FF5102", s=300, zorder=800, marker='*', label='J2116+1555')
+plt.scatter(df7_rpm["J-K Color"][2], df7_rpm["RPM_W1"][2], c="black", s=750, zorder=700, marker='*')
+plt.scatter(df7_rpm["J-K Color"][0], df7_rpm["RPM_W1"][0], c="black", s=750, zorder=700, marker='*')
+plt.scatter(df7_rpm["J-K Color"][1], df7_rpm["RPM_W1"][1], c="black", s=750, zorder=700, marker='*')
+plt.scatter(ourdata["J-K Color"], ourdata["RPM_W1"], c="#1874CD", s=20, zorder=6,label='Our Data')
+
+
+
+plt.scatter(gg["J-K Color"], gg["RPM W1"], c="#AEB3BF", alpha=0.25,s=1.5, label="Comparison Objects")
+plt.scatter(g["J-K Color"], g["RPM_W1"], c="#FF3030", s=25, zorder=100,label='Outliers')
 plt.title("RPM W1 Graph", fontsize=15)
 plt.xlabel("J-K Color", fontsize=13)
 plt.ylabel("RPM_W1", fontsize=13)
-plt.gca().invert_yaxis()
-ax = plt.subplot(111)
 # Creating Legend inside
 ax.legend()
 plt.show()
-# Creating Legend outside
-chartBox = ax.get_position()
-ax.set_position([chartBox.x0, chartBox.y0, chartBox.width*0.6, chartBox.height])
-ax.legend(loc='upper center', bbox_to_anchor=(1.45, 0.8), shadow=True, ncol=1)
-plt.show()
+plt.xlabel("$J-K$", fontsize=25)
+plt.ylabel("H$_W1$", fontsize=25)
+for axis in ['top', 'bottom', 'left', 'right']:  # Thicken the frame
+    ax.spines[axis].set_linewidth(2)
+plt.gca().invert_yaxis()
+ax = plt.subplot(111)
+ax.tick_params(axis="both", which="major", labelsize=20, width=1.1, length=8)
+
+
+
+
 
 
 # Saving Figure

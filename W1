@@ -3,7 +3,7 @@ from pandas import DataFrame
 import pandas as pd
 import numpy as np
 # reading in text file
-df = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Dec_1224.tsv", sep="\t", comment="#", header=0)
+df = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Dec_12245.tsv", sep="\t", comment="#", header=0)
 df1 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - SpeX_Jul4.tsv", sep="\t", comment="#", header=0)
 df2 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/IRTF_SpeX (SRMP) - Feb28.tsv", sep="\t", comment="#", header=0)
 # df4 = pd.read_csv("/Users/Tony/Dropbox/SRMP_shared/BDKP.txt", sep="\s+", comment="#", header=0,
@@ -57,8 +57,10 @@ df6_rpm = df6_rpm.rename(columns={'Proper Motion b': 'Total Proper Motion', 'Pro
 frames = [df_rpm, df1_rpm, df2_rpm, df4_rpm, df5_rpm, df6_rpm]
 # replace the Zero and start numbering the data
 
-ourdata = pd.concat(frames, ignore_index= True)
 
+ourdata = pd.concat(frames, ignore_index= True)
+ourdata = ourdata[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
+               "WISE Date", "Designation"]]
 # Fixing Data
 o=dfLSPM[(dfLSPM['PM'] < 0)]
 dfLSPM = dfLSPM[dfLSPM.PM !=-0.163]
@@ -80,6 +82,11 @@ df7_rpm["J-K Color"] = df7_rpm["J"]-df7_rpm["K"]
 df8_rpm["RPM_W1"] = df8_rpm["W1"]+5*np.log10(df8_rpm["Total Proper Motion"]/1000)+5
 df8_rpm["J-K Color"] = df8_rpm["J"]-df8_rpm["K"]
 
+ourdata = ourdata[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
+               "WISE Date","J-K Color", "RPM_W1", "Designation"]]
+#df8_rpm = df8_rpm[['NAME', 'J', "J_err", "H", "H_err", "K", "K_err", "W1", "W1_err", 'Total Proper Motion', "2MASS Date",
+              # "WISE Date","J-K Color", "RPM_W1", "Designation"]]
+
 frames90 = [dfLSPM, dfBDKP3A]
 gg = pd.concat(frames90)
 
@@ -88,20 +95,26 @@ gg = pd.concat(frames90)
 p=ourdata[(ourdata['RPM_W1'] > 20)]
 u=ourdata[(ourdata['J-K Color'] > 2)]
 b=ourdata[(ourdata['RPM_W1'] < 7.5)]
+q=df8_rpm[(df8_rpm["RPM_W1"] > 20)]
+w=df8_rpm[(df8_rpm["J-K Color"] > 2)]
+e=df8_rpm[(df8_rpm["RPM_W1"] < 7.5)]
 # adding the points together
-frames1 = [ p, u, b]
+frames1 = [ p, u, b, q, w, e]
 g = pd.concat(frames1)
 
 # removing the duplicates
 g = g.drop_duplicates(subset=['RPM_W1'], keep="first")
+g=g[(g['RPM_W1'] > 10)]
+ourdata=ourdata.drop(104)
+#ourdata=ourdata.fillna(0)
+#df10_rpm=[df8_rpm, ourdata]
 
-df9_rpm =[df8_rpm, ourdata]
 
 #plotting RPM W1 v J-K color
 fig=plt.figure()
 fig.set_size_inches(10, 6.45)
 ax = fig.add_subplot(111)
-plt.scatter(df8_rpm["J-K Color"], df8_rpm["RPM_W1"], c="#1874CD", s=20, zorder=6)
+#plt.scatter(df8_rpm["J-K Color"], df8_rpm["RPM_W1"], c="#1874CD", s=20, zorder=6)
 # our objects
 plt.scatter(df7_rpm["J-K Color"][0], df7_rpm["RPM_W1"][0], c="indigo", s=300, zorder=800, marker='*', label='J0044+0228')
 plt.scatter(df7_rpm["J-K Color"][1], df7_rpm["RPM_W1"][1], c="#005200", s=300, zorder=800, marker='*', label='J2012+6726')
@@ -110,8 +123,6 @@ plt.scatter(df7_rpm["J-K Color"][2], df7_rpm["RPM_W1"][2], c="black", s=750, zor
 plt.scatter(df7_rpm["J-K Color"][0], df7_rpm["RPM_W1"][0], c="black", s=750, zorder=700, marker='*')
 plt.scatter(df7_rpm["J-K Color"][1], df7_rpm["RPM_W1"][1], c="black", s=750, zorder=700, marker='*')
 plt.scatter(ourdata["J-K Color"], ourdata["RPM_W1"], c="#1874CD", s=20, zorder=6,label='Our Data')
-
-
 
 plt.scatter(gg["J-K Color"], gg["RPM W1"], c="#AEB3BF", alpha=0.25,s=1.5, label="Comparison Objects")
 plt.scatter(g["J-K Color"], g["RPM_W1"], c="#FF3030", s=25, zorder=100,label='Outliers')
@@ -122,7 +133,7 @@ plt.ylabel("RPM_W1", fontsize=13)
 ax.legend()
 plt.show()
 plt.xlabel("$J-K$", fontsize=25)
-plt.ylabel("H$_W1$", fontsize=25)
+plt.ylabel("H$_W$1$", fontsize=25)
 for axis in ['top', 'bottom', 'left', 'right']:  # Thicken the frame
     ax.spines[axis].set_linewidth(2)
 plt.gca().invert_yaxis()
